@@ -4,23 +4,52 @@ import os
 import datetime
 from enum import Enum
 
-# -- Language & Health Advice Dictionaries (fill as needed) --
+# ---------------------- Language & Health Dictionaries ----------------------
 LANGS = {
-    # Add your language dictionaries: 'en', 'hi', 'hi_en'
+    "en": {
+        "select_lang": "Select Language",
+        "pin_label": "Enter Pincode (Required):",
+        "pin_not_found": "Pincode not found!",
+        "district": "District",
+        "state": "State",
+        "office": "Office",
+        "sample_type": "Sample Type",
+        "params_entry": "Enter Water Parameters",
+        "predict_btn": "Predict",
+        "prediction_result": "Prediction Result",
+        "pass": "✔️ Pass",
+        "fail": "❌ Fail",
+        "not_entered": "Not Entered",
+        "fill_warn": "Fill at least {n} parameters (with TDS).",
+        "tds_req": "TDS is compulsory.",
+        "safe_water": "Water is SAFE as per standards.",
+        "unsafe_water": "Water is NOT SAFE!",
+        "advice_heading": "Advice",
+        "stp_ok": "STP running well!",
+        "stp_not_ok": "STP not OK, fix needed.",
+        "download": "Download CSV"
+    }
 }
+
 HEALTH_ADVICE = {
-    # Add your health advice mappings
+    "TDS": "High TDS harms kidneys, especially infants.",
+    "BOD": "High BOD: organic pollution.",
+    "pH": "Imbalanced pH: can corrode pipes, harm gut."
 }
+
 GENERAL_HEALTH_WARNING = (
-    "If any parameter FAILS: Boil or filter water before use. "
-    "Consult water safety experts. For infants/pregnant/ill, strict care needed!"
+    "If any parameter FAILS: Boil/filter water before use. Infants/ill—extra care. Consult water experts if needed."
 )
 
-ALL_PARAMS = [...]      # List of all water testing parameters
-STP_PARAMS = [...]      # List of STP-specific parameters
-PARAMS_LIMITS = {...}   # Parameter limits: {param: (low, high, standard)}
+ALL_PARAMS = ["pH", "TDS", "BOD"]
+STP_PARAMS = ["pH", "TDS"]
+PARAMS_LIMITS = {
+    "pH": (0.0, 14.0, (6.5, 8.5)),
+    "TDS": (0.0, 5000.0, 2000.0),
+    "BOD": (0.0, 100.0, 10.0)
+}
 
-# -- Helper: Resolve path for CSVs
+# ---------------------- Helper: Resolve CSV Path ----------------------
 def get_csv_path(fname):
     if os.path.exists(fname): return fname
     if os.path.exists(f"data/{fname}"): return f"data/{fname}"
@@ -36,7 +65,7 @@ def load_pincode_df():
     df['pincode'] = df['pincode'].astype(str)
     return df
 
-# -- Page Routing Setup --
+# ---------------------- Enum & Routing Setup ----------------------
 class Page(Enum):
     HOME = 1
     SAFE_WATER = 2
@@ -50,11 +79,9 @@ class Page(Enum):
 
 if 'page' not in st.session_state:
     st.session_state.page = Page.HOME
-
 def go_to(page):
     st.session_state.page = page
 
-# -- Home Page Modules/Cards --
 modules = [
     {"title": "Safe Water", "desc": "Clean water quality AI", "icon": "💧", "page": Page.SAFE_WATER},
     {"title": "Plant Operations", "desc": "WTP, STP, ETP plant ops & performance.", "icon": "🏭", "page": Page.PLANT_OPERATIONS},
@@ -66,7 +93,7 @@ modules = [
     {'title': 'Feedback', 'desc': 'Give ideas or report any issue.', 'icon': '📝', 'page': Page.FEEDBACK},
 ]
 
-# -- Home Page Function --
+# ----------------------- Home Page Cards -----------------------
 def home_page():
     st.markdown("<h1 style='text-align:center;color:#0073b1'>JalMitr AI Home</h1>", unsafe_allow_html=True)
     st.markdown("<h4 style='text-align:center;'>All Water & Hygiene Modules, One Click Away</h4>", unsafe_allow_html=True)
@@ -85,14 +112,14 @@ def home_page():
                 go_to(m['page'])
     st.info("JalMitr – All Features, One Destination")
 
-# -- Safe Water Prediction Module --
+# --------------------- Safe Water Prediction Module ---------------------
 def safe_water_module():
     st.button("⬅️ Back", on_click=lambda: go_to(Page.HOME))
     st.title("💧 Safe Water Quality Prediction")
     lang_code = st.selectbox(
         "🌐 "+LANGS['en']["select_lang"],
-        ["en", "hi_en", "hi"],
-        format_func=lambda x: {"en": "English", "hi_en": "Hinglish", "hi": "हिन्दी"}[x]
+        ["en"],  # Aap other langs tabhi dijiye jab data bhar lein
+        format_func=lambda x: {"en": "English"}[x]
     )
     msg = LANGS[lang_code]
     pincode = st.text_input(msg['pin_label'], key='pin')
@@ -118,10 +145,8 @@ def safe_water_module():
         st.info(f"{msg['district']}: {row.iloc[0]['district']} | "
                 f"{msg['state']}: {row.iloc[0]['statename']} | "
                 f"{msg['office']}: {row.iloc[0]['officename']}")
-
     params = STP_PARAMS if stype == "STP" else ALL_PARAMS
     min_params = 3 if stype == "STP" else 5
-
     st.header(msg['params_entry'])
     vals = {}
     param_cols = st.columns(4)
@@ -166,7 +191,7 @@ def safe_water_module():
                 else:
                     status = msg["pass"] if val <= std else msg["fail"]
                     slimit = f"≤{std}"
-                if status in (msg["fail"], "❌ Fail", "❌ असफल", "Fail"):
+                if status in (msg["fail"], "❌ Fail"):
                     fail.append(pname)
             table.append({
                 'Parameter': pname,
@@ -201,43 +226,43 @@ def safe_water_module():
             mime='text/csv'
         )
 
-# -- Placeholder Modules (extend with your own logic) --
+# --------------------- Dummy Module Placeholders ---------------------
 def plant_operations_module():
     st.button("⬅️ Back", on_click=lambda: go_to(Page.HOME))
     st.header("🏭 Plant Operations")
-    st.info("All about plant operations of WTP, STP, and ETP (coming soon).")
+    st.info("Coming soon: Logging, performance & AI help.")
 
 def wash_module():
     st.button("⬅️ Back", on_click=lambda: go_to(Page.HOME))
     st.header("🧼 WASH - Water, Sanitation, Hygiene")
-    st.info("All about hygiene for kids/families (coming soon).")
+    st.info("Coming soon: Hygiene guides and AI help.")
 
 def disaster_response_module():
     st.button("⬅️ Back", on_click=lambda: go_to(Page.HOME))
     st.title("🚨 Disaster Response")
-    st.info("Water disaster and crisis help will be here.")
+    st.info("Coming soon: Disaster water help.")
 
 def q_box_module():
     st.button("⬅️ Back", on_click=lambda: go_to(Page.HOME))
     st.title("🤖 Water AI Chatbot")
-    st.info("Chat with OpenAI/Gemini/JJM Assistant (coming soon).")
+    st.info("Coming soon: AI Water Q&A.")
 
 def jjm_insights_module():
     st.button("⬅️ Back", on_click=lambda: go_to(Page.HOME))
     st.title("🇮🇳 JJM Insights")
-    st.info("India's Jal Jeevan Mission tips, Q&A.")
+    st.info("Coming soon: Jal Jeevan Mission guides.")
 
 def analytics_module():
     st.button("⬅️ Back", on_click=lambda: go_to(Page.HOME))
     st.title("📊 Data Analytics")
-    st.info("Charts, batch uploads, trends module coming soon.")
+    st.info("Coming soon: Uploads, trends, graphs.")
 
 def feedback_module():
     st.button("⬅️ Back", on_click=lambda: go_to(Page.HOME))
     st.title("📝 Feedback")
-    st.info("Feedback/complaint/contact form coming soon.")
+    st.info("Coming soon: Feedback/contact form.")
 
-# -- Main Router (Navigation) --
+# ------------------------- Main Router -------------------------
 if st.session_state.page == Page.HOME:
     home_page()
 elif st.session_state.page == Page.SAFE_WATER:
