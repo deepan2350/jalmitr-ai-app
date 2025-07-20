@@ -37,10 +37,10 @@ def load_pincode_df():
 class Page(Enum):
     HOME = 1
     SAFE_WATER = 2
-    HAND_WASHING = 3
-    HYGIENE_EDUC = 4
+    PLANT_OPERATIONS = 3
+    WASH = 4
     DISASTER = 5
-    AI_BOT = 6
+    Q_BOX = 6
     JJM_INSIGHTS = 7
     ANALYTICS = 8
     FEEDBACK = 9
@@ -172,14 +172,13 @@ def safe_water_module():
         st.download_button(label=msg["download"], data=csv, file_name=f"JalMitr_Report_{datetime.date.today()}.csv", mime='text/csv')
 
 # ---- Dummy Module Placeholders (copy pattern to expand) ----
-def hand_washing_module():
+def plant_operations_module():
     st.button("⬅️ Back", on_click=lambda: go_to(Page.HOME))
-    st.title("🧼 Hand Washing")
-    st.info("Hand hygiene module coming soon.")
-
-def hygiene_education_module():
+    st.header("🏭 Plant Operations")
+    st.info("All about plant operations of wtp stp and etp (coming soon).")
+def wash_module():
     st.button("⬅️ Back", on_click=lambda: go_to(Page.HOME))
-    st.title("📚 Hygiene Education")
+    st.header("🧼 WASH - Water, Sanitation, Hygiene")
     st.info("All about hygiene for kids/families (coming soon).")
 
 def disaster_response_module():
@@ -187,7 +186,7 @@ def disaster_response_module():
     st.title("🚨 Disaster Response")
     st.info("Water disaster and crisis help will be here.")
 
-def ai_bot_module():
+def q_box_module():
     st.button("⬅️ Back", on_click=lambda: go_to(Page.HOME))
     st.title("🤖 Water AI Chatbot")
     st.info("Chat with OpenAI/Gemini/JJM Assistant (coming soon).")
@@ -213,13 +212,13 @@ if st.session_state.page == Page.HOME:
 elif st.session_state.page == Page.SAFE_WATER:
     safe_water_module()
 elif st.session_state.page == Page.HAND_WASHING:
-    hand_washing_module()
+    plant_operations_module()
 elif st.session_state.page == Page.HYGIENE_EDUC:
-    hygiene_education_module()
+    wash_module()
 elif st.session_state.page == Page.DISASTER:
     disaster_response_module()
 elif st.session_state.page == Page.AI_BOT:
-    ai_bot_module()
+    q_box_module()
 elif st.session_state.page == Page.JJM_INSIGHTS:
     jjm_insights_module()
 elif st.session_state.page == Page.ANALYTICS:
