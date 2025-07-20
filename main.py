@@ -83,7 +83,7 @@ def home_page():
             )
             if st.button(m['title'], key=m['title']):
                 go_to(m['page'])
-    st.info("JalMitr par saare features ek jagah.")
+    st.info("JalMitr – All Features, One Destination")
 
 # -- Safe Water Prediction Module --
 def safe_water_module():
