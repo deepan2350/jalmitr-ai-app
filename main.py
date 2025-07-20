@@ -52,10 +52,10 @@ def go_to(page): st.session_state.page = page
 # ---- Modules for home page
 modules = [
     {'title': 'Safe Water', 'desc': 'Check and predict water quality.', 'icon': '💧', 'page': Page.SAFE_WATER},
-    {'title': 'Hand Washing', 'desc': 'Learn best hand hygiene practices.', 'icon': '🧼', 'page': Page.HAND_WASHING},
-    {'title': 'Hygiene Education', 'desc': 'Hygiene info & training.', 'icon': '📚', 'page': Page.HYGIENE_EDUC},
+    {'title': 'Plant Operations', 'desc': 'WTP,STP, ETP Plant operations, maintenance, performance.', 'icon":"🏭", "page":Page.PLANT_OPS},
+    {'title': 'WASH', 'desc': 'Hygiene info & training.', 'icon': '📚', 'page': Page.HYGIENE_EDUC},
     {'title': 'Disaster Response', 'desc': 'Emergency guidance & help.', 'icon': '🚨', 'page': Page.DISASTER},
-    {'title': 'Water AI Chatbot', 'desc': 'Ask JJM/Water Q&A from AI!', 'icon': '🤖', 'page': Page.AI_BOT},
+    {'title': 'Q Box', 'desc': 'Ask Water Q&A from AI!', 'icon': '🤖', 'page': Page.AI_BOT},
     {'title': 'JJM Insights', 'desc': 'Explore Jal Jeevan Mission tips.', 'icon': '🇮🇳', 'page': Page.JJM_INSIGHTS},
     {'title': 'Data Analytics', 'desc': 'Charts & batch uploads.', 'icon': '📊', 'page': Page.ANALYTICS},
     {'title': 'Feedback', 'desc': 'Give ideas or report any issue.', 'icon': '📝', 'page': Page.FEEDBACK},
