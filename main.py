@@ -52,7 +52,7 @@ def go_to(page): st.session_state.page = page
 # ---- Modules for home page
 modules = [
     {'title': 'Safe Water', 'desc': 'Check and predict water quality.', 'icon': '💧', 'page': Page.SAFE_WATER},
-    {'title': 'Plant Operations', 'desc': 'WTP,STP, ETP Plant operations, maintenance, performance.', 'icon":"🏭", "page":Page.PLANT_OPS},
+    {"title": "Plant Operations", "desc": "WTP, STP, ETP plant operations, maintenance, performance.", "icon": "🏭", "page": Page.PLANT_OPS},
     {'title': 'WASH', 'desc': 'Hygiene info & training.', 'icon': '📚', 'page': Page.HYGIENE_EDUC},
     {'title': 'Disaster Response', 'desc': 'Emergency guidance & help.', 'icon': '🚨', 'page': Page.DISASTER},
     {'title': 'Q Box', 'desc': 'Ask Water Q&A from AI!', 'icon': '🤖', 'page': Page.AI_BOT},
