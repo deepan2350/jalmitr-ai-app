@@ -1,77 +1,72 @@
 import streamlit as st
 import openai
 import os
-import time
 from gtts import gTTS
-import tempfile
 import base64
+import tempfile
 import speech_recognition as sr
 
-# Step 1: Chat history initialize
-if "qbox_chat" not in st.session_state:
-    st.session_state.qbox_chat = []
+openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY", "")
 
-# Step 2: Title & Description
-st.title("🤖 Q Box - JalMitr AI Chatbot")
-st.markdown("Paani se related koi bhi sawal AI se poochhiye. Type ya bolo – dono chalega!")
+def speak_text(text, lang="hi"):
+    tts = gTTS(text=text, lang=lang)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
+        tts.save(fp.name)
+        audio_bytes = open(fp.name, "rb").read()
+        b64 = base64.b64encode(audio_bytes).decode()
+        st.markdown(
+            f'<audio controls autoplay><source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>',
+            unsafe_allow_html=True,
+        )
 
-# Step 3: OpenAI Key Setup (you can also set this in secrets if deploying)
-openai.api_key = os.getenv("OPENAI_API_KEY") or "sk-xxxxxx"  # ⚠️ Replace with your key
-
-# Step 4: User Input (Text)
-user_input = st.text_input("✍️ Aapka sawaal yahan likhiye:")
-
-# Step 5: Voice Input
-def recognize_voice():
+def recognize_voice(lang="hi-IN"):
     r = sr.Recognizer()
     with sr.Microphone() as source:
-        st.info("🎤 Bolna shuru kijiye...")
-        audio = r.listen(source, timeout=5)
-    try:
-        text = r.recognize_google(audio, language="hi-IN")
-        st.success(f"🔊 Aapne kaha: {text}")
-        return text
-    except sr.UnknownValueError:
-        st.error("😕 Samajh nahi aaya. Phir se boliye.")
-    except sr.RequestError:
-        st.error("🌐 Network issue aayi hai.")
+        st.info("🎤 Listening... Speak now")
+        try:
+            audio = r.listen(source, timeout=5)
+            text = r.recognize_google(audio, language=lang)
+            st.success(f"🗣️ You said: {text}")
+            return text
+        except sr.UnknownValueError:
+            st.error("❌ Could not understand audio")
+        except sr.RequestError:
+            st.error("⚠️ Voice recognition error")
     return ""
 
-if st.button("🎙️ Voice se poochho"):
-    voice_q = recognize_voice()
-    if voice_q:
-        user_input = voice_q
-
-# Step 6: Generate AI Response
-def ask_gpt(q):
-    if not q:
+def ask_ai(question):
+    if not openai.api_key:
+        st.error("❌ OpenAI API key missing.")
         return ""
-    st.session_state.qbox_chat.append({"role": "user", "content": q})
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo", messages=st.session_state.qbox_chat
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": question}],
         )
-        reply = response.choices[0].message.content
-        st.session_state.qbox_chat.append({"role": "assistant", "content": reply})
-        return reply
+        return response.choices[0].message.content.strip()
     except Exception as e:
-        st.error(f"❌ Error: {str(e)}")
+        st.error(f"AI Error: {e}")
         return ""
 
-if user_input:
-    response = ask_gpt(user_input)
-    if response:
-        st.markdown("🧠 **AI ka jawab:**")
-        st.success(response)
+def run():
+    st.title("🤖 Q Box - JalMitr AI Chatbot")
+    st.markdown("Paani se related sawal puchhiye — likh kar ya bol kar! AI aapko jawab dega voice + text me.")
 
-        # Step 7: Voice Output
-        tts = gTTS(text=response, lang="hi")
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
-            tts.save(fp.name)
-            audio_bytes = open(fp.name, "rb").read()
-            b64 = base64.b64encode(audio_bytes).decode()
-            st.markdown(
-                f'<audio controls autoplay><source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>',
-                unsafe_allow_html=True,
-            )
+    lang_choice = st.selectbox("🗣️ Choose Language", ["hi", "en"])
+    input_mode = st.radio("🎛️ Select Input Mode", ["⌨️ Type", "🎤 Voice"])
+
+    user_query = ""
+
+    if input_mode == "⌨️ Type":
+        user_query = st.text_input("Aapka sawaal:")
+    else:
+        if st.button("🎙️ Bolna shuru karo"):
+            user_query = recognize_voice(lang="hi-IN" if lang_choice == "hi" else "en-IN")
+
+    if user_query:
+        with st.spinner("🤖 Soch raha hai..."):
+            reply = ask_ai(user_query)
+            st.success(reply)
+            st.markdown("🔊 **Voice Output:**")
+            speak_text(reply, lang=lang_choice)
 
