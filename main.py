@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import datetime
 from enum import Enum
+from modules import q_box_module
 
 
 # -------- Language & Health Advice Dicts --------
@@ -292,9 +293,8 @@ def disaster_response_module():
 
 
 def q_box_module():
-    st.button("⬅️ Back to Home", on_click=lambda: go_to(Page.HOME))
-    st.header("🤖 Water AI Chatbot")
-    st.info("Coming soon: Chat with JalMitr AI assistant.")
+    q_box_module.run()
+
 
 
 def jjm_insights_module():
